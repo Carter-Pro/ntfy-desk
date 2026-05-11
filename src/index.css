@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fluent Design Dark Theme - Primary Brand */
+  --color-fluent-primary: #0078d4;
+  --color-fluent-primary-dark: #005a9e;
+  --color-fluent-primary-light: #40b6ff;
+
+  /* Status Colors */
+  --color-fluent-success: #107c10;
+  --color-fluent-warning: #ffd700;
+  --color-fluent-error: #c50f1f;
+
+  /* Semantic */
+  --color-fluent-connected: #107c10;
+  --color-fluent-disconnected: #c50f1f;
+  --color-fluent-dnd: #ffd700;
+}
+
+/* Global transitions (from UI_DESIGN.md) */
+* {
+  transition-property: background-color, border-color, color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus indicators */
+button:focus-visible {
+  outline: 2px solid #0078d4;
+  outline-offset: 2px;
+}
+
+/* Glass effect utility */
+.glass {
+  background-color: rgba(45, 45, 45, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
