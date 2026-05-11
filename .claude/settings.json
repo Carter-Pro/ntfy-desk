@@ -13,13 +13,17 @@
       "WebFetch(domain:tauri.app)",
       "WebFetch(domain:tailwindcss.com)",
       "WebFetch(domain:react.dev)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(gh repo *)"
     ]
   },
   "mcpServers": {
     "sqlite": {
       "command": "npx",
-      "args": ["-y", "@berthojoris/mcp-sqlite-server"]
+      "args": [
+        "-y",
+        "@berthojoris/mcp-sqlite-server"
+      ]
     }
   }
 }
