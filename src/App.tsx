@@ -1,17 +1,11 @@
 import { useEffect } from "react";
 import { useStore } from "./store";
+import Inbox from "./components/Inbox";
 import Settings from "./components/Settings";
-
-function formatTimestamp(ts: string | null): string {
-  if (!ts) return "";
-  const date = new Date(ts);
-  return date.toLocaleString();
-}
 
 function App() {
   const {
     subscriptions,
-    messages,
     selectedSubscriptionId,
     activeTab,
     error,
@@ -118,7 +112,7 @@ function App() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-hidden">
           {/* Error banner */}
           {error && (
             <div className="mb-4 px-4 py-3 bg-[#c50f1f]/20 border border-[#c50f1f]/40 rounded text-[13px] text-[#e0e0e0]">
@@ -127,43 +121,7 @@ function App() {
           )}
 
           {/* Inbox tab */}
-          {activeTab === "inbox" && (
-            <section>
-              <h2 className="text-[20px] font-semibold mb-4">Inbox</h2>
-              {messages.length === 0 ? (
-                <p className="text-[13px] text-[#999999]">
-                  {selectedSubscriptionId
-                    ? "No messages for this subscription."
-                    : "Select a subscription to view messages."}
-                </p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`px-4 py-3 rounded border border-white/[0.08] hover:bg-white/[0.03] transition-colors ${
-                        !msg.is_read ? "bg-white/[0.03]" : ""
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-[14px] font-medium text-white">
-                          {msg.title || "(no title)"}
-                        </h3>
-                        <time className="text-[11px] text-[#999999] whitespace-nowrap shrink-0">
-                          {formatTimestamp(msg.received_at)}
-                        </time>
-                      </div>
-                      {msg.body && (
-                        <p className="text-[13px] text-[#e0e0e0] mt-1 line-clamp-2">
-                          {msg.body}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
+          {activeTab === "inbox" && <Inbox />}
 
           {/* Settings tab */}
           {activeTab === "settings" && (
