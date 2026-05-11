@@ -101,6 +101,7 @@ export const useStore = create<StoreState>((set, get) => ({
     }));
     try {
       await invoke<void>("mark_read", { id });
+      set({ error: null });
     } catch (err) {
       set({ messages: previousMessages, error: String(err) });
     }
@@ -113,6 +114,7 @@ export const useStore = create<StoreState>((set, get) => ({
     }));
     try {
       await invoke<void>("delete_message", { id });
+      set({ error: null });
     } catch (err) {
       set({ messages: previousMessages, error: String(err) });
     }
