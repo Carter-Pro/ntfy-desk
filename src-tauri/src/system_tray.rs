@@ -14,7 +14,9 @@ pub fn build(app: &tauri::AppHandle) -> Result<()> {
         .build()?;
 
     TrayIconBuilder::new()
-        .icon(app.default_window_icon().cloned().unwrap())
+        .icon(app.default_window_icon().cloned().ok_or_else(|| {
+            crate::error::Error::Config("no default window icon configured".into())
+        })?)
         .menu(&menu)
         .on_menu_event(|app, event| {
             match event.id().as_ref() {
