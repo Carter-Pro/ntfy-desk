@@ -88,6 +88,16 @@ docs/                         # Design documents
 - **Testing**: inline `#[cfg(test)]` modules for Rust; vitest + @testing-library/react for frontend; coverage targets per module (see design doc)
 - **Config**: no hardcoded values; no secrets in code; use `RUST_LOG=debug` for dev logging
 
+## Plan-to-Implementation Quality Rules
+
+To prevent information loss between design and implementation:
+
+1. **Re-read design doc before writing plan** — when invoking `writing-plans`, read the full design document first. Do not rely on memory.
+
+2. **Requirement traceability** — after writing the implementation plan, produce a quick mapping of each design requirement → which plan task covers it. If any requirement has no task, fix the plan.
+
+3. **Subagent sees the design** — when dispatching subagent implementation tasks, include the relevant design document section in the prompt so the subagent can self-verify against the original intent.
+
 ## Development Roadmap
 
 Follow the [Development Plan](docs/DEVELOPMENT_PLAN.md) — 6 phases with dependency graph:
