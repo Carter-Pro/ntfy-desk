@@ -1,11 +1,11 @@
-mod commands;
-mod config;
-mod database;
-mod error;
-mod models;
-mod notification_service;
-mod ntfy_client;
-mod system_tray;
+pub mod commands;
+pub mod config;
+pub mod database;
+pub mod error;
+pub mod models;
+pub mod notification_service;
+pub mod ntfy_client;
+pub mod system_tray;
 
 use std::collections::HashMap;
 use std::sync::Mutex;
