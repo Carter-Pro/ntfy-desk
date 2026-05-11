@@ -34,8 +34,20 @@ impl AppState {
 pub fn run() {
     env_logger::init();
 
-    let config = Config::new().expect("failed to initialize config");
-    let db = Database::open(config.data_dir()).expect("failed to open database");
+    let config = match Config::new() {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("ntfy desk: failed to initialize config: {}", e);
+            std::process::exit(1);
+        }
+    };
+    let db = match Database::open(config.data_dir()) {
+        Ok(d) => d,
+        Err(e) => {
+            eprintln!("ntfy desk: failed to open database: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     log::info!(
         "ntfy desk started — config dir: {:?}, data dir: {:?}",
@@ -57,18 +69,21 @@ pub fn run() {
 
             for sub in subscriptions {
                 if sub.is_active {
-                    let db = Database::open(state.config.data_dir())
-                        .expect("failed to open database for listener");
+                    let db = match Database::open(state.config.data_dir()) {
+                        Ok(d) => d,
+                        Err(e) => {
+                            log::error!("failed to open database for listener: {}", e);
+                            continue;
+                        }
+                    };
                     let handle = app_handle.clone();
                     let sub_clone = sub.clone();
                     let join_handle = tauri::async_runtime::spawn(async move {
                         ntfy_client::run_subscription_listener(sub_clone, db, handle).await;
                     });
-                    state
-                        .connection_handles
-                        .lock()
-                        .unwrap()
-                        .insert(sub.id.unwrap(), join_handle);
+                    if let (Some(id), Ok(mut handles)) = (sub.id, state.connection_handles.lock()) {
+                        handles.insert(id, join_handle);
+                    }
                 }
             }
 
@@ -81,7 +96,13 @@ pub fn run() {
                 loop {
                     interval.tick().await;
                     let state = app_handle_cleanup.state::<Mutex<AppState>>();
-                    let app_state = state.lock().unwrap();
+                    let app_state = match state.lock() {
+                        Ok(s) => s,
+                        Err(e) => {
+                            log::error!("auto-cleanup: failed to lock state: {}", e);
+                            continue;
+                        }
+                    };
                     match app_state.db.load_app_settings() {
                         Ok(settings) => {
                             match app_state.db.cleanup_old_messages(settings.message_retention_days) {
