@@ -48,4 +48,16 @@ describe("useStore", () => {
     useStore.getState().setActiveTab("inbox");
     expect(useStore.getState().activeTab).toBe("inbox");
   });
+
+  it("deleteMessage optimistically removes from local state", () => {
+    useStore.setState({
+      messages: [
+        { id: 1, subscription_id: 1, title: "t1", body: null, timestamp: null, received_at: "", is_read: false },
+        { id: 2, subscription_id: 1, title: "t2", body: null, timestamp: null, received_at: "", is_read: false },
+      ],
+    });
+    useStore.getState().deleteMessage(1);
+    expect(useStore.getState().messages).toHaveLength(1);
+    expect(useStore.getState().messages[0].id).toBe(2);
+  });
 });

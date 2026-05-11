@@ -71,4 +71,19 @@ describe("Settings", () => {
     render(<Settings />);
     expect(screen.getByText("test")).toBeDefined();
   });
+
+  it("hides DND time inputs when DND is disabled", () => {
+    useStore.setState({
+      settings: { ...useStore.getState().settings, dnd_enabled: false, dnd_start: "22:00", dnd_end: "08:00" },
+    });
+    render(<Settings />);
+    expect(screen.queryByDisplayValue("22:00")).toBeNull();
+  });
+
+  it("closes add dialog when Cancel is clicked", () => {
+    render(<Settings />);
+    fireEvent.click(screen.getByText("Add Subscription"));
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(screen.queryByPlaceholderText("ntfy server URL (e.g. https://ntfy.sh/mytopic)")).toBeNull();
+  });
 });
