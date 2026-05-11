@@ -1,21 +1,7 @@
-#![allow(dead_code)]
-
 mod common;
 
 use wiremock::{MockServer, Mock, ResponseTemplate};
 use wiremock::matchers::{method, path};
-
-use ntfy_desk_lib::models::Subscription;
-
-fn mock_sub(url: &str) -> Subscription {
-    Subscription {
-        id: Some(1),
-        url: url.to_string(),
-        topic: "test".into(),
-        is_active: true,
-        created_at: String::new(),
-    }
-}
 
 fn json_line(title: &str, body: &str) -> String {
     format!(
@@ -27,7 +13,7 @@ fn json_line(title: &str, body: &str) -> String {
 }
 
 #[tokio::test]
-async fn test_single_message_parsed() {
+async fn parse_message_from_mock_stream() {
     let mock_server = MockServer::start().await;
     let line = json_line("Hello", "World");
 
@@ -37,41 +23,48 @@ async fn test_single_message_parsed() {
         .mount(&mock_server)
         .await;
 
-    // Verify mock responds correctly
+    let json_url = ntfy_desk_lib::ntfy_client::build_json_url(
+        &format!("{}/test", mock_server.uri()), "test"
+    ).unwrap();
+
+    // Verify URL construction produces correct path
+    assert!(json_url.ends_with("/test/json"));
+
+    // Fetch and parse the actual message
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/test/json", mock_server.uri()))
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(resp.status(), 200);
+    let resp = client.get(&json_url).send().await.unwrap();
     let body = resp.text().await.unwrap();
-    assert_eq!(body.trim(), line.trim());
+    let first_line = body.lines().next().unwrap();
+    let parsed = ntfy_desk_lib::ntfy_client::parse_message(first_line, 1).unwrap();
+    assert_eq!(parsed.title.as_deref(), Some("Hello"));
+    assert_eq!(parsed.body.as_deref(), Some("World"));
 }
 
 #[tokio::test]
-async fn test_multiple_messages_parsed() {
-    let mock_server = MockServer::start().await;
-    let lines: Vec<String> = (0..5)
-        .map(|i| json_line(&format!("Title {}", i), &format!("Body {}", i)))
-        .collect();
-    let body = lines.join("\n") + "\n";
+async fn build_json_url_from_real_url() {
+    let url = ntfy_desk_lib::ntfy_client::build_json_url(
+        "http://192.168.1.1:8080/alerts", "alerts"
+    ).unwrap();
+    assert_eq!(url, "http://192.168.1.1:8080/alerts/json");
+}
 
+#[tokio::test]
+async fn error_response_handled() {
+    let mock_server = MockServer::start().await;
     Mock::given(method("GET"))
         .and(path("/test/json"))
-        .respond_with(ResponseTemplate::new(200).set_body_string(body))
+        .respond_with(ResponseTemplate::new(500))
         .mount(&mock_server)
         .await;
 
+    let json_url = ntfy_desk_lib::ntfy_client::build_json_url(
+        &format!("{}/test", mock_server.uri()), "test"
+    ).unwrap();
+
     let client = reqwest::Client::new();
-    let resp = client
-        .get(format!("{}/test/json", mock_server.uri()))
-        .send()
-        .await
-        .unwrap();
-    let text = resp.text().await.unwrap();
-    let parsed: Vec<_> = text.lines().filter(|l| !l.trim().is_empty()).collect();
-    assert_eq!(parsed.len(), 5);
+    let resp = client.get(&json_url).send().await.unwrap();
+    // Verify our URL builder + HTTP client correctly propagate errors
+    assert_eq!(resp.status(), 500);
 }
 
 #[tokio::test]
@@ -104,28 +97,9 @@ async fn test_invalid_json_skipped_by_parser() {
 }
 
 #[tokio::test]
-async fn test_connection_error_handled() {
-    let mock_server = MockServer::start().await;
-
-    Mock::given(method("GET"))
-        .and(path("/test/json"))
-        .respond_with(ResponseTemplate::new(500))
-        .mount(&mock_server)
-        .await;
-
-    let client = reqwest::Client::new();
-    let response = client
-        .get(format!("{}/test/json", mock_server.uri()))
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), 500);
-}
-
-#[tokio::test]
 async fn test_db_message_roundtrip() {
     let (db, _dir) = common::setup_temp_db();
-    let sub = common::create_test_sub(&db);
+    let sub = common::create_test_sub(&db, "http://127.0.0.1:8766/test-topic");
     let sub_id = sub.id.unwrap();
 
     // Insert messages via the DB API

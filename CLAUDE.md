@@ -68,12 +68,10 @@ src-tauri/                    # Rust backend (Tauri)
   src/
     main.rs                   # Desktop entry point
     lib.rs                    # Tauri builder + commands + plugins
+  tests/                      # Rust integration tests (Cargo discovers from here)
   Cargo.toml                  # Rust dependencies
   tauri.conf.json             # Tauri config (window, bundle, identifier)
   capabilities/default.json   # Permissions
-tests/
-  backend/                    # Rust integration tests
-  frontend/                   # E2E / component tests
 docs/                         # Design documents
   Project_Design_Document.md  # Architecture, DB schema, testing strategy
   UI_DESIGN.md                # Fluent Design palette, component specs

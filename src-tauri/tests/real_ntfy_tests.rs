@@ -1,14 +1,15 @@
 mod common;
 
 use std::time::Duration;
-use ntfy_desk_lib::ntfy_client;
+use futures_util::StreamExt;
 
 #[tokio::test]
-#[ignore = "requires Docker ntfy server on localhost:8766"]
+#[ignore = "requires Docker daemon running"]
 async fn connect_to_real_ntfy_stream() {
+    let (base_url, _container) = common::start_ntfy_container().await;
     let topic = common::test_topic();
-    let url = format!("{}/{}", common::real_ntfy_url(), topic);
-    let json_url = ntfy_client::build_json_url(&url, &topic).unwrap();
+    let url = format!("{}/{}", base_url, topic);
+    let json_url = ntfy_desk_lib::ntfy_client::build_json_url(&url, &topic).unwrap();
 
     let client = reqwest::Client::new();
     let resp = client
@@ -19,16 +20,27 @@ async fn connect_to_real_ntfy_stream() {
         .expect("failed to connect to ntfy JSON stream");
 
     assert!(resp.status().is_success(), "expected 200, got {}", resp.status());
+
+    // Verify the stream actually sends data (open event)
+    let mut stream = resp.bytes_stream();
+    let first_chunk = tokio::time::timeout(
+        Duration::from_secs(3),
+        stream.next()
+    ).await.expect("timeout waiting for stream data").expect("stream closed without data");
+    let bytes = first_chunk.unwrap();
+    let text = String::from_utf8_lossy(&bytes);
+    assert!(text.contains("\"event\""), "expected JSON event in stream, got: {}", text);
 }
 
 #[tokio::test]
-#[ignore = "requires Docker ntfy server on localhost:8766"]
+#[ignore = "requires Docker daemon running"]
 async fn publish_and_receive_message() {
+    let (base_url, _container) = common::start_ntfy_container().await;
     let topic = common::test_topic();
-    let url = format!("{}/{}", common::real_ntfy_url(), topic);
+    let url = format!("{}/{}", base_url, topic);
+    let client = reqwest::Client::new();
 
     // Publish a test message
-    let client = reqwest::Client::new();
     let resp = client
         .post(&url)
         .header("Title", "Integration Test")
@@ -36,26 +48,24 @@ async fn publish_and_receive_message() {
         .send()
         .await
         .expect("failed to publish test message");
-
     assert!(resp.status().is_success(), "publish failed: {}", resp.status());
 
-    // Verify the message appears in the JSON stream
-    let json_url = ntfy_client::build_json_url(&url, &topic).unwrap();
-    let stream_resp = client
-        .get(&json_url)
-        .timeout(Duration::from_secs(3))
-        .send()
-        .await
-        .expect("failed to connect to JSON stream");
+    // Verify the message DATA is actually present via poll
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    let poll_url = format!("{}/json?poll=1", url);
+    let resp = client.get(&poll_url).send().await.unwrap();
+    let body = resp.text().await.unwrap();
 
-    assert!(stream_resp.status().is_success());
+    assert!(body.contains("Integration Test"), "published title not found in response");
+    assert!(body.contains("Hello from integration test"), "published body not found in response");
 }
 
 #[tokio::test]
-#[ignore = "requires Docker ntfy server on localhost:8766"]
+#[ignore = "requires Docker daemon running"]
 async fn batch_message_publish_and_verify() {
+    let (base_url, _container) = common::start_ntfy_container().await;
     let topic = common::test_topic();
-    let url = format!("{}/{}", common::real_ntfy_url(), topic);
+    let url = format!("{}/{}", base_url, topic);
     let client = reqwest::Client::new();
 
     // Publish 5 messages

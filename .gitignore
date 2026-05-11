@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 dist-ssr/
+target/
 src-tauri/target/
 
 # Tauri
