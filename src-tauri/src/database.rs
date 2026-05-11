@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::{Mutex, MutexGuard};
 
 use crate::error::Result;
 use crate::models::{AppSettings, Message, Subscription};
@@ -22,7 +22,7 @@ impl Database {
     }
 
     fn init(&self) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS subscriptions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,10 +56,14 @@ impl Database {
         Ok(())
     }
 
+    fn lock(&self) -> Result<MutexGuard<'_, Connection>> {
+        self.conn.lock().map_err(|e| crate::error::Error::Config(format!("database lock poisoned: {}", e)))
+    }
+
     // ── Subscriptions ──
 
     pub fn add_subscription(&self, url: &str, topic: &str) -> Result<Subscription> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute(
             "INSERT INTO subscriptions (url, topic) VALUES (?1, ?2)",
             rusqlite::params![url, topic],
@@ -75,14 +79,14 @@ impl Database {
     }
 
     pub fn remove_subscription(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute("DELETE FROM messages WHERE subscription_id = ?1", rusqlite::params![id])?;
         conn.execute("DELETE FROM subscriptions WHERE id = ?1", rusqlite::params![id])?;
         Ok(())
     }
 
     pub fn get_subscriptions(&self) -> Result<Vec<Subscription>> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         let mut stmt = conn.prepare(
             "SELECT id, url, topic, is_active, created_at FROM subscriptions ORDER BY created_at",
         )?;
@@ -102,7 +106,7 @@ impl Database {
     // ── Messages ──
 
     pub fn insert_message(&self, msg: &Message) -> Result<Message> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute(
             "INSERT INTO messages (subscription_id, title, body, timestamp)
              VALUES (?1, ?2, ?3, ?4)",
@@ -116,7 +120,7 @@ impl Database {
     }
 
     pub fn insert_message_batch(&self, msgs: &[Message]) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         let tx = conn.unchecked_transaction()?;
         for msg in msgs {
             tx.execute(
@@ -130,7 +134,7 @@ impl Database {
     }
 
     pub fn get_messages(&self, subscription_id: Option<i64>, limit: u32, offset: u32) -> Result<Vec<Message>> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         let (sql, params): (&str, Vec<Box<dyn rusqlite::types::ToSql>>) = if let Some(sub_id) = subscription_id {
             (
                 "SELECT id, subscription_id, title, body, timestamp, received_at, is_read
@@ -162,19 +166,19 @@ impl Database {
     }
 
     pub fn mark_read(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute("UPDATE messages SET is_read = 1 WHERE id = ?1", rusqlite::params![id])?;
         Ok(())
     }
 
     pub fn delete_message(&self, id: i64) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute("DELETE FROM messages WHERE id = ?1", rusqlite::params![id])?;
         Ok(())
     }
 
     pub fn cleanup_old_messages(&self, retention_days: u32) -> Result<usize> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         let count = conn.execute(
             "DELETE FROM messages WHERE received_at < datetime('now', ?1)",
             rusqlite::params![format!("-{} days", retention_days)],
@@ -185,7 +189,7 @@ impl Database {
     // ── Settings ──
 
     pub fn get_setting(&self, key: &str) -> Result<Option<String>> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         let mut stmt = conn.prepare("SELECT value FROM settings WHERE key = ?1")?;
         let mut rows = stmt.query_map(rusqlite::params![key], |row| row.get::<_, String>(0))?;
         match rows.next() {
@@ -195,7 +199,7 @@ impl Database {
     }
 
     pub fn set_setting(&self, key: &str, value: &str) -> Result<()> {
-        let conn = self.conn.lock().expect("database lock poisoned");
+        let conn = self.lock()?;
         conn.execute(
             "INSERT INTO settings (key, value) VALUES (?1, ?2)
              ON CONFLICT(key) DO UPDATE SET value = excluded.value",
@@ -382,7 +386,7 @@ mod tests {
         };
         db.insert_message(&msg).unwrap();
         // Manually set received_at to 2 days ago so cleanup catches it
-        let conn = db.conn.lock().expect("database lock poisoned");
+        let conn = db.conn.lock().unwrap();
         conn.execute(
             "UPDATE messages SET received_at = datetime('now', '-2 days')",
             [],
