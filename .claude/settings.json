@@ -1,5 +1,4 @@
 {
-  "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
       "Read(/Users/carter/Programs/ntfy-desk/**)",
@@ -13,9 +12,11 @@
       "WebFetch(domain:tailwindcss.com)",
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:github.com)",
-      "McpServer(sqlite)"
+      "McpServer(sqlite)",
+      "WebFetch(domain:docs.ntfy.sh)"
     ]
   },
+  "defaultMode": "acceptEdits",
   "mcpServers": {
     "sqlite": {
       "command": "npx",

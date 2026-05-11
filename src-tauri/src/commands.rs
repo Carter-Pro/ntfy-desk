@@ -24,7 +24,7 @@ pub fn add_subscription(
     let db = crate::database::Database::open(app_state.config.data_dir()).map_err(map_err)?;
     let handle = app_handle.clone();
     let sub_clone = sub.clone();
-    let join_handle = tokio::spawn(async move {
+    let join_handle = tauri::async_runtime::spawn(async move {
         crate::ntfy_client::run_subscription_listener(sub_clone, db, handle).await;
     });
     app_state.connection_handles.lock().unwrap().insert(sub_id, join_handle);

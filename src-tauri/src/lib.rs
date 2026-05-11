@@ -17,7 +17,7 @@ use tauri::Manager;
 pub struct AppState {
     pub db: Database,
     pub config: Config,
-    pub connection_handles: Mutex<HashMap<i64, tokio::task::JoinHandle<()>>>,
+    pub connection_handles: Mutex<HashMap<i64, tauri::async_runtime::JoinHandle<()>>>,
 }
 
 impl AppState {
@@ -61,7 +61,7 @@ pub fn run() {
                         .expect("failed to open database for listener");
                     let handle = app_handle.clone();
                     let sub_clone = sub.clone();
-                    let join_handle = tokio::spawn(async move {
+                    let join_handle = tauri::async_runtime::spawn(async move {
                         ntfy_client::run_subscription_listener(sub_clone, db, handle).await;
                     });
                     state
@@ -76,7 +76,7 @@ pub fn run() {
 
             // Spawn periodic auto-cleanup task
             let app_handle_cleanup = app.handle().clone();
-            tokio::spawn(async move {
+            tauri::async_runtime::spawn(async move {
                 let mut interval = tokio::time::interval(std::time::Duration::from_secs(3600));
                 loop {
                     interval.tick().await;
