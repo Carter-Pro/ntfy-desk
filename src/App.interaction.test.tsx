@@ -13,9 +13,10 @@ beforeEach(() => {
   invokeMock.mockResolvedValueOnce({    // get_settings
     dnd_enabled: false, dnd_start: "22:00", dnd_end: "08:00",
     notification_volume: 80, message_retention_days: 30,
-    startup_run: true, minimize_to_tray: true, notification_sound: "default",
+    notification_sound: "default", startup_run: true, minimize_to_tray: true,
   });
-  invokeMock.mockResolvedValue([]);     // get_messages (always returns [] to prevent Inbox crash)
+  invokeMock.mockResolvedValueOnce([]); // get_messages (mount-time, no subscription selected)
+  invokeMock.mockResolvedValueOnce([]); // get_messages (tab switch back to Inbox)
   useStore.setState({
     subscriptions: [
       { id: 1, url: "https://ntfy.sh/test", topic: "test", is_active: true, created_at: "" },

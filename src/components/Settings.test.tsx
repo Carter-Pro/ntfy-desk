@@ -16,6 +16,7 @@ beforeEach(() => {
       dnd_end: "08:00",
       notification_volume: 80,
       message_retention_days: 30,
+      notification_sound: "default",
       startup_run: true,
       minimize_to_tray: true,
     },

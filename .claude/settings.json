@@ -13,7 +13,8 @@
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:github.com)",
       "McpServer(sqlite)",
-      "WebFetch(domain:docs.ntfy.sh)"
+      "WebFetch(domain:docs.ntfy.sh)",
+      "Read(//Users/carter/.cargo/registry/src/**)"
     ]
   },
   "defaultMode": "acceptEdits",

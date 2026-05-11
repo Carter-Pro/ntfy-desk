@@ -22,6 +22,7 @@ export interface AppSettings {
   dnd_end: string;
   notification_volume: number;
   message_retention_days: number;
+  notification_sound: string;
   startup_run: boolean;
   minimize_to_tray: boolean;
 }
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   dnd_end: "08:00",
   notification_volume: 80,
   message_retention_days: 30,
+  notification_sound: "default",
   startup_run: true,
   minimize_to_tray: true,
 };
