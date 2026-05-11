@@ -113,15 +113,26 @@ impl Database {
             rusqlite::params![msg.subscription_id, msg.title, msg.body, msg.timestamp],
         )?;
         let id = conn.last_insert_rowid();
+        // Read back the database-computed received_at
+        let received_at: String = conn.query_row(
+            "SELECT received_at FROM messages WHERE id = ?1",
+            rusqlite::params![id],
+            |row| row.get(0),
+        )?;
         Ok(Message {
             id: Some(id),
-            ..msg.clone()
+            subscription_id: msg.subscription_id,
+            title: msg.title.clone(),
+            body: msg.body.clone(),
+            timestamp: msg.timestamp.clone(),
+            received_at,
+            is_read: msg.is_read,
         })
     }
 
     pub fn insert_message_batch(&self, msgs: &[Message]) -> Result<()> {
-        let conn = self.lock()?;
-        let tx = conn.unchecked_transaction()?;
+        let mut conn = self.lock()?;
+        let tx = conn.transaction()?;
         for msg in msgs {
             tx.execute(
                 "INSERT INTO messages (subscription_id, title, body, timestamp)
@@ -231,6 +242,9 @@ impl Database {
         if let Some(v) = self.get_setting("minimize_to_tray")? {
             settings.minimize_to_tray = v == "true";
         }
+        if let Some(v) = self.get_setting("notification_sound")? {
+            settings.notification_sound = v;
+        }
         Ok(settings)
     }
 
@@ -242,6 +256,7 @@ impl Database {
         self.set_setting("message_retention_days", &settings.message_retention_days.to_string())?;
         self.set_setting("startup_run", if settings.startup_run { "true" } else { "false" })?;
         self.set_setting("minimize_to_tray", if settings.minimize_to_tray { "true" } else { "false" })?;
+        self.set_setting("notification_sound", &settings.notification_sound)?;
         Ok(())
     }
 }

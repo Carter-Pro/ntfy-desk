@@ -29,6 +29,7 @@ pub struct AppSettings {
     pub message_retention_days: u32,
     pub startup_run: bool,
     pub minimize_to_tray: bool,
+    pub notification_sound: String,
 }
 
 impl Default for AppSettings {
@@ -41,6 +42,7 @@ impl Default for AppSettings {
             message_retention_days: 30,
             startup_run: true,
             minimize_to_tray: true,
+            notification_sound: "default".into(),
         }
     }
 }
