@@ -69,6 +69,7 @@ ntfy-desk/
 
 ## Documentation
 
+- [Development Plan](docs/DEVELOPMENT_PLAN.md) — 6-phase implementation plan with dependency graph
 - [Project Design Document](docs/Project_Design_Document.md) — Architecture, DB schema, testing strategy
 - [UI Design Specification](docs/UI_DESIGN.md) — Fluent Design color palette, component specs, typography
 - [CLAUDE.md](CLAUDE.md) — Development conventions and AI agent guidance

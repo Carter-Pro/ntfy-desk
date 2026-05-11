@@ -88,6 +88,16 @@ docs/                         # Design documents
 - **Testing**: inline `#[cfg(test)]` modules for Rust; vitest + @testing-library/react for frontend; coverage targets per module (see design doc)
 - **Config**: no hardcoded values; no secrets in code; use `RUST_LOG=debug` for dev logging
 
+## Development Roadmap
+
+Follow the [Development Plan](docs/DEVELOPMENT_PLAN.md) — 6 phases with dependency graph:
+1. Data Foundation (DB + config + models)
+2. Connectivity & Services (WebSocket + notifications + tray)
+3. IPC Bridge (Tauri commands)
+4. Frontend Foundation (layout + store + hooks)
+5. Frontend Features (components)
+6. Polish & Integration
+
 ## SQLite MCP Server
 
 A SQLite MCP server (`@berthojoris/mcp-sqlite-server`) is configured in `.claude/settings.json`. It allows inspecting the app database directly during development. Pass the database path explicitly:
