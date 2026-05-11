@@ -1,12 +1,17 @@
 {
   "permissions": {
     "allow": [
+      "Read(**/Programs/ntfy-desk/**)",
+      "Write(**/Programs/ntfy-desk/**)",
+      "Edit(**/Programs/ntfy-desk/**)",
       "Bash(cargo *)",
       "Bash(npm *)",
       "Bash(npx *)",
       "Bash(volta *)",
+      "Bash(git *)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
+      "Bash(gh *)",
       "WebSearch",
       "WebFetch(domain:crates.io)",
       "WebFetch(domain:docs.rs)",
@@ -14,7 +19,7 @@
       "WebFetch(domain:tailwindcss.com)",
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:github.com)",
-      "Bash(gh repo *)"
+      "McpServer(sqlite)"
     ]
   },
   "mcpServers": {
