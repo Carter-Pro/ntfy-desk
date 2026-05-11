@@ -204,4 +204,43 @@ mod tests {
         assert_eq!(msg.title, None);
         assert_eq!(msg.body.as_deref(), Some("just body"));
     }
+
+    #[test]
+    fn test_parse_message_all_fields_missing() {
+        let json = r#"{}"#;
+        let msg = parse_message(json, 1).unwrap();
+        assert_eq!(msg.title, None);
+        assert_eq!(msg.body, None);
+        assert_eq!(msg.timestamp, None);
+        assert_eq!(msg.subscription_id, 1);
+    }
+
+    #[test]
+    fn test_parse_message_unicode() {
+        let json = r#"{"title":"🔥 Fire alert","message":"サーバー障害"}"#;
+        let msg = parse_message(json, 1).unwrap();
+        assert_eq!(msg.title.as_deref(), Some("🔥 Fire alert"));
+        assert_eq!(msg.body.as_deref(), Some("サーバー障害"));
+    }
+
+    #[test]
+    fn test_parse_message_very_long_body() {
+        let long = "x".repeat(10000);
+        let json = format!(r#"{{"message":"{}"}}"#, long);
+        let msg = parse_message(&json, 1).unwrap();
+        assert_eq!(msg.body.as_deref().unwrap().len(), 10000);
+    }
+
+    #[test]
+    fn test_parse_message_invalid_json_returns_none() {
+        assert!(parse_message("not json at all", 1).is_none());
+        assert!(parse_message("", 1).is_none());
+        assert!(parse_message("{broken", 1).is_none());
+    }
+
+    #[test]
+    fn test_build_json_url_preserves_port() {
+        let url = build_json_url("http://192.168.1.1:8766/alerts", "alerts").unwrap();
+        assert_eq!(url, "http://192.168.1.1:8766/alerts/json");
+    }
 }

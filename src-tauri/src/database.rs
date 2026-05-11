@@ -387,6 +387,35 @@ mod tests {
     }
 
     #[test]
+    fn test_add_duplicate_subscription_fails() {
+        let (db, _dir) = setup_db();
+        db.add_subscription("https://ntfy.sh/test", "test").unwrap();
+        let result = db.add_subscription("https://ntfy.sh/test", "test-again");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_get_messages_pagination_boundary() {
+        let (db, _dir) = setup_db();
+        let sub = db.add_subscription("https://ntfy.sh/test", "test").unwrap();
+        // Insert 3 messages
+        for i in 0..3 {
+            let msg = Message {
+                id: None, subscription_id: sub.id.unwrap(),
+                title: Some(format!("msg {}", i)), body: None,
+                timestamp: None, received_at: String::new(), is_read: false,
+            };
+            db.insert_message(&msg).unwrap();
+        }
+        // Offset beyond total should return empty
+        let result = db.get_messages(None, 10, 100).unwrap();
+        assert!(result.is_empty());
+        // Limit 1 should return exactly 1
+        let result = db.get_messages(None, 1, 0).unwrap();
+        assert_eq!(result.len(), 1);
+    }
+
+    #[test]
     fn test_cleanup_old_messages() {
         let (db, _dir) = setup_db();
         let sub = db.add_subscription("https://ntfy.sh/test", "test").unwrap();

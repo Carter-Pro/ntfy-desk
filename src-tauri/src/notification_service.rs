@@ -107,4 +107,42 @@ mod tests {
     fn test_dnd_start_equals_end_inactive() {
         assert!(!is_dnd_active_at(&settings(true, "12:00", "12:00"), time(12, 0)));
     }
+
+    #[test]
+    fn test_dnd_midnight_boundary_active() {
+        // 23:00–01:00, at 00:30 DND should be active
+        assert!(is_dnd_active_at(&settings(true, "23:00", "01:00"), time(0, 30)));
+    }
+
+    #[test]
+    fn test_dnd_midnight_boundary_inactive() {
+        // 23:00–01:00, at 12:00 DND should be inactive
+        assert!(!is_dnd_active_at(&settings(true, "23:00", "01:00"), time(12, 0)));
+    }
+
+    #[test]
+    fn test_dnd_exact_boundary_start() {
+        // At exactly the start time, DND should be active
+        assert!(is_dnd_active_at(&settings(true, "22:00", "08:00"), time(22, 0)));
+    }
+
+    #[test]
+    fn test_dnd_exact_boundary_end() {
+        // At exactly the end time, DND should be inactive (end is exclusive)
+        assert!(!is_dnd_active_at(&settings(true, "22:00", "08:00"), time(8, 0)));
+    }
+
+    #[test]
+    fn test_dnd_invalid_time_format_uses_defaults() {
+        // "abc" can't be parsed, should fall back to defaults (22:00 / 08:00)
+        let s = AppSettings {
+            dnd_enabled: true,
+            dnd_start: "abc".into(),
+            dnd_end: "xyz".into(),
+            ..Default::default()
+        };
+        // Should not panic, should use fallback 22:00-08:00
+        let result = is_dnd_active_at(&s, time(12, 0));
+        assert!(!result); // noon is outside 22:00-08:00
+    }
 }
