@@ -81,7 +81,7 @@ function Settings() {
         {/* Add Dialog */}
         {showDialog && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-[#2d2d2d] border border-white/[0.08] rounded-lg p-6 w-96 shadow-2xl">
+            <div className="glass dialog-enter rounded-lg p-6 w-96 shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[16px] font-semibold">
                   Add Subscription

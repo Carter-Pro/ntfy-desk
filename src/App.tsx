@@ -36,7 +36,7 @@ function App() {
       {/* App Header */}
       <header className="h-[52px] flex items-center px-4 bg-[#202020]/80 backdrop-blur border-b border-white/[0.08] shrink-0">
         <h1 className="text-lg font-semibold">ntfy desk</h1>
-        <span className="ml-auto text-[12px] text-[#999999]">v0.1.0</span>
+        <span className="ml-auto px-2 py-0.5 text-[11px] text-[#999999] bg-white/[0.06] rounded-full">v0.1.0</span>
       </header>
 
       {/* Body */}
@@ -67,7 +67,7 @@ function App() {
                   key={sub.id}
                   data-testid="sidebar-sub"
                   onClick={() => selectSubscription(sub.id)}
-                  className={`w-full text-left px-4 py-3 hover:bg-white/[0.05] transition-colors ${
+                  className={`w-full text-left px-4 py-3 hover:bg-white/[0.05] transition-colors rounded-md mx-2 ${
                     selectedSubscriptionId === sub.id ? "bg-white/[0.08]" : ""
                   }`}
                 >

@@ -44,9 +44,9 @@ function Inbox() {
         </h2>
 
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <InboxIcon size={32} className="text-[#999] mb-3" />
-            <p className="text-xs text-[#999]">
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <InboxIcon size={40} className="text-[#999] opacity-40 mb-3" />
+            <p className="text-sm text-text-tertiary">
               {selectedSubscriptionId === null
                 ? "Select a subscription to view messages."
                 : "No messages for this subscription."}
@@ -60,15 +60,18 @@ function Inbox() {
               onClick={() => handleSelect(msg)}
               className={`w-full text-left px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.08] transition-colors ${
                 selectedMessageId === msg.id ? "bg-white/[0.06]" : ""
-              } ${!msg.is_read ? "border-l-2 border-l-[#0078d4]" : ""}`}
+              } ${!msg.is_read ? "border-l-[3px] border-l-[#0078d4]" : ""}`}
             >
               <div className="flex items-start justify-between gap-2">
-                <span
-                  className={`text-[14px] ${
-                    msg.is_read ? "text-[#999]" : "text-white font-semibold"
-                  } line-clamp-1`}
-                >
-                  {msg.title || "(no title)"}
+                <span className="flex items-center gap-1.5 min-w-0">
+                  {!msg.is_read && <span className="w-1.5 h-1.5 rounded-full bg-[#0078d4] shrink-0 mt-1.5" />}
+                  <span
+                    className={`text-[14px] ${
+                      msg.is_read ? "text-[#999]" : "text-white font-semibold"
+                    } line-clamp-1`}
+                  >
+                    {msg.title || "(no title)"}
+                  </span>
                 </span>
                 <time className="text-[11px] text-[#999] whitespace-nowrap shrink-0">
                   {formatTime(msg.received_at)}
@@ -97,9 +100,9 @@ function Inbox() {
             }}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <InboxIcon size={32} className="text-[#999] mb-3" />
-            <p className="text-xs text-[#999]">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <InboxIcon size={40} className="text-[#999] opacity-40 mb-3" />
+            <p className="text-sm text-text-tertiary">
               Select a message to view details.
             </p>
           </div>

@@ -27,7 +27,7 @@
 
 /* Global transitions (from UI_DESIGN.md) */
 * {
-  transition-property: background-color, border-color, color, opacity;
+  transition-property: background-color, border-color, color, opacity, transform;
   transition-duration: 150ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -43,4 +43,22 @@ button:focus-visible {
   background-color: rgba(45, 45, 45, 0.4);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Dark scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Button active state */
+button:active:not(:disabled) { transform: scale(0.98); }
+
+/* Dialog enter animation */
+@keyframes dialog-enter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.dialog-enter {
+  animation: dialog-enter 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
