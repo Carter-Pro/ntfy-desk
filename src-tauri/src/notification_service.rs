@@ -16,6 +16,11 @@ fn is_dnd_active(settings: &AppSettings) -> bool {
     let end = chrono::NaiveTime::parse_from_str(&settings.dnd_end, "%H:%M")
         .unwrap_or_else(|_| chrono::NaiveTime::from_hms_opt(8, 0, 0).unwrap());
 
+    // If start equals end, DND is misconfigured — treat as inactive
+    if start == end {
+        return false;
+    }
+
     if start <= end {
         now >= start && now < end
     } else {
@@ -79,6 +84,13 @@ mod tests {
     fn test_dnd_overnight_inactive_at_noon() {
         // 22:00–08:00 overnight, noon (12:00) should be inactive
         let s = settings(true, "22:00", "08:00");
+        assert!(!is_dnd_active(&s));
+    }
+
+    #[test]
+    fn test_dnd_start_equals_end_inactive() {
+        let s = settings(true, "12:00", "12:00");
+        // Should not panic and should return false (no time range)
         assert!(!is_dnd_active(&s));
     }
 }
