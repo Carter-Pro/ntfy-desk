@@ -73,6 +73,31 @@ pub fn run() {
             }
 
             app.manage(Mutex::new(state));
+
+            // Spawn periodic auto-cleanup task
+            let app_handle_cleanup = app.handle().clone();
+            tokio::spawn(async move {
+                let mut interval = tokio::time::interval(std::time::Duration::from_secs(3600));
+                loop {
+                    interval.tick().await;
+                    let state = app_handle_cleanup.state::<Mutex<AppState>>();
+                    let app_state = state.lock().unwrap();
+                    match app_state.db.load_app_settings() {
+                        Ok(settings) => {
+                            match app_state.db.cleanup_old_messages(settings.message_retention_days) {
+                                Ok(count) => {
+                                    if count > 0 {
+                                        log::info!("auto-cleanup: removed {} old messages", count);
+                                    }
+                                }
+                                Err(e) => log::error!("auto-cleanup error: {}", e),
+                            }
+                        }
+                        Err(e) => log::error!("auto-cleanup: failed to load settings: {}", e),
+                    }
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
