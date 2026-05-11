@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use reqwest::Client;
 use serde::Deserialize;
 use url::Url;
 
@@ -46,7 +45,11 @@ pub fn parse_message(json: &str, subscription_id: i64) -> Option<Message> {
     let timestamp = ntfy_msg.time.map(|t| {
         chrono::DateTime::from_timestamp(t, 0)
             .map(|dt| dt.to_rfc3339())
-            .unwrap_or_else(|| t.to_string())
+            .unwrap_or_else(|| {
+                chrono::DateTime::from_timestamp(0, 0)
+                    .map(|dt| dt.to_rfc3339())
+                    .unwrap_or_default()
+            })
     });
 
     Some(Message {
@@ -63,15 +66,12 @@ pub fn parse_message(json: &str, subscription_id: i64) -> Option<Message> {
 /// Main connection loop: connect to ntfy HTTP JSON stream, receive messages,
 /// store them in the database, and trigger notifications.
 async fn connect_and_listen(
+    client: &reqwest::Client,
     json_url: &str,
     subscription_id: i64,
     db: &Database,
     app_handle: &tauri::AppHandle,
 ) -> Result<()> {
-    let client = Client::builder()
-        .build()
-        .map_err(|e| crate::error::Error::Config(format!("HTTP client error: {}", e)))?;
-
     let response = client
         .get(json_url)
         .send()
@@ -132,11 +132,21 @@ pub async fn run_subscription_listener(
         }
     };
 
+    let client = match reqwest::Client::builder()
+        .build()
+    {
+        Ok(c) => c,
+        Err(e) => {
+            log::error!("failed to create HTTP client: {}", e);
+            return;
+        }
+    };
+
     let mut backoff = 1u64;
     let max_backoff = 60;
 
     loop {
-        match connect_and_listen(&json_url, sub_id, &db, &app_handle).await {
+        match connect_and_listen(&client, &json_url, sub_id, &db, &app_handle).await {
             Ok(()) => {
                 log::info!("HTTP stream closed, reconnecting in {}s...", backoff);
             }

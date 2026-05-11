@@ -94,8 +94,3 @@ pub fn update_setting(
 ) -> CmdResult<()> {
     lock_state(&state)?.db.set_setting(&key, &value).map_err(map_err)
 }
-
-#[tauri::command]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
