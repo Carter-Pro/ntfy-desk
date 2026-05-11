@@ -23,7 +23,9 @@ cargo build                       # debug build
 cargo build --release             # release build
 cargo fmt                         # format
 cargo clippy -- -D warnings       # lint
-cargo test                        # run all Rust tests
+cargo test                        # run all Rust unit tests
+cargo test --tests                 # run integration tests (mock)
+cargo test --tests -- --ignored    # include real ntfy tests (requires Docker)
 
 # Frontend
 npm run dev                       # Vite dev server
