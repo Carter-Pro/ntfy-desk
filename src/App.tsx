@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "./store";
+import Settings from "./components/Settings";
 
 function formatTimestamp(ts: string | null): string {
   if (!ts) return "";
@@ -166,12 +167,9 @@ function App() {
 
           {/* Settings tab */}
           {activeTab === "settings" && (
-            <section>
-              <h2 className="text-[20px] font-semibold mb-4">Settings</h2>
-              <p className="text-[13px] text-[#999999]">
-                Settings panel coming in Phase 5.
-              </p>
-            </section>
+            <div className="overflow-y-auto h-full">
+              <Settings />
+            </div>
           )}
         </main>
       </div>
