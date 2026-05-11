@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "./store";
+import ErrorBoundary from "./ErrorBoundary";
 import Inbox from "./components/Inbox";
 import Settings from "./components/Settings";
 
@@ -28,7 +29,8 @@ function App() {
   }, [selectedSubscriptionId, activeTab, loadMessages]);
 
   return (
-    <div className="h-screen flex flex-col bg-[#202020] text-white">
+    <ErrorBoundary>
+      <div className="h-screen flex flex-col bg-[#202020] text-white">
       {/* App Header */}
       <header className="h-[52px] flex items-center px-4 bg-[#202020]/80 backdrop-blur border-b border-white/[0.08] shrink-0">
         <h1 className="text-[16px] font-semibold">ntfy desk</h1>
@@ -131,7 +133,8 @@ function App() {
           )}
         </main>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 
