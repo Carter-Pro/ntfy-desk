@@ -21,7 +21,7 @@ struct NtfyMessage {
 
 /// Build an HTTP JSON stream URL from an HTTP ntfy server URL and topic.
 /// Keeps http/https scheme and appends `/json` to the path.
-fn build_json_url(http_url: &str, _topic: &str) -> std::result::Result<String, crate::error::Error> {
+pub fn build_json_url(http_url: &str, _topic: &str) -> std::result::Result<String, crate::error::Error> {
     let mut url = Url::parse(http_url).map_err(|e| {
         crate::error::Error::Config(format!("invalid ntfy server URL '{}': {}", http_url, e))
     })?;
@@ -41,7 +41,7 @@ fn build_json_url(http_url: &str, _topic: &str) -> std::result::Result<String, c
     Ok(url.to_string())
 }
 
-fn parse_message(json: &str, subscription_id: i64) -> Option<Message> {
+pub fn parse_message(json: &str, subscription_id: i64) -> Option<Message> {
     let ntfy_msg: NtfyMessage = serde_json::from_str(json).ok()?;
     let timestamp = ntfy_msg.time.map(|t| {
         chrono::DateTime::from_timestamp(t, 0)
