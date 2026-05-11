@@ -115,7 +115,7 @@ function App() {
         <main className="flex-1 overflow-hidden">
           {/* Error banner */}
           {error && (
-            <div className="mb-4 px-4 py-3 bg-[#c50f1f]/20 border border-[#c50f1f]/40 rounded text-[13px] text-[#e0e0e0]">
+            <div className="mx-4 mt-4 px-4 py-3 bg-[#c50f1f]/20 border border-[#c50f1f]/40 rounded text-[13px] text-[#e0e0e0]">
               {error}
             </div>
           )}
@@ -125,7 +125,7 @@ function App() {
 
           {/* Settings tab */}
           {activeTab === "settings" && (
-            <div className="overflow-y-auto h-full">
+            <div className="overflow-y-auto h-full p-6">
               <Settings />
             </div>
           )}
