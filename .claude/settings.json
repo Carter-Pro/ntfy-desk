@@ -1,17 +1,11 @@
 {
+  "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "Read(**/Programs/ntfy-desk/**)",
-      "Write(**/Programs/ntfy-desk/**)",
-      "Edit(**/Programs/ntfy-desk/**)",
-      "Bash(cargo *)",
-      "Bash(npm *)",
-      "Bash(npx *)",
-      "Bash(volta *)",
-      "Bash(git *)",
-      "Bash(ls:*)",
-      "Bash(mkdir:*)",
-      "Bash(gh *)",
+      "Read(/Users/carter/Programs/ntfy-desk/**)",
+      "Write(/Users/carter/Programs/ntfy-desk/**)",
+      "Edit(/Users/carter/Programs/ntfy-desk/**)",
+      "Bash(*)",
       "WebSearch",
       "WebFetch(domain:crates.io)",
       "WebFetch(domain:docs.rs)",
