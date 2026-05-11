@@ -36,6 +36,7 @@ function Settings() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[16px] font-semibold">Subscriptions</h2>
           <button
+            data-testid="add-subscription-btn"
             onClick={() => setShowDialog(true)}
             className="flex items-center gap-1 px-3 py-2 bg-[#0078d4] hover:bg-[#005a9e] text-white text-sm rounded-lg transition-colors"
           >
@@ -96,6 +97,7 @@ function Settings() {
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                data-testid="sub-url-input"
                 placeholder="ntfy server URL (e.g. https://ntfy.sh/mytopic)"
                 className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded-lg text-white text-sm placeholder-[#999] focus:border-[#0078d4] outline-none mb-3"
               />
@@ -103,11 +105,13 @@ function Settings() {
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
+                data-testid="sub-topic-input"
                 placeholder="Topic name"
                 className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded-lg text-white text-sm placeholder-[#999] focus:border-[#0078d4] outline-none mb-6"
               />
               <div className="flex gap-2">
                 <button
+                  data-testid="sub-add-btn"
                   onClick={handleAdd}
                   disabled={!url.trim() || !topic.trim()}
                   className="flex-1 px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
@@ -115,6 +119,7 @@ function Settings() {
                   Add
                 </button>
                 <button
+                  data-testid="sub-cancel-btn"
                   onClick={() => setShowDialog(false)}
                   className="flex-1 px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white rounded-lg text-sm font-medium transition-colors"
                 >
@@ -134,6 +139,7 @@ function Settings() {
             <span className="text-[14px]">Enable DND</span>
             <input
               type="checkbox"
+              data-testid="dnd-toggle"
               checked={settings.dnd_enabled}
               onChange={(e) =>
                 updateSetting("dnd_enabled", String(e.target.checked))

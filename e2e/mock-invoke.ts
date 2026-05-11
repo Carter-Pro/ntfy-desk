@@ -31,7 +31,7 @@ export async function setupMocks(page: Page, data: MockData = {}) {
           case "get_settings":
             return Promise.resolve(sets);
           case "add_subscription":
-            return Promise.resolve({ id: Date.now(), ...args });
+            return Promise.resolve({ id: 999, url: args?.url, topic: args?.topic, is_active: true, created_at: new Date().toISOString() });
           case "remove_subscription":
             return Promise.resolve();
           case "mark_read":
@@ -41,7 +41,7 @@ export async function setupMocks(page: Page, data: MockData = {}) {
           case "update_setting":
             return Promise.resolve();
           default:
-            return Promise.resolve(null);
+            return Promise.reject(new Error(`Unknown Tauri command: ${cmd}`));
         }
       };
       // @ts-ignore

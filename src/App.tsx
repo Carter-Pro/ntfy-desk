@@ -18,6 +18,8 @@ function App() {
   } = useStore();
 
   useEffect(() => {
+    // Expose store for E2E testing
+    (window as any).__store = useStore;
     loadSubscriptions();
     loadSettings();
   }, [loadSubscriptions, loadSettings]);
@@ -63,6 +65,7 @@ function App() {
               subscriptions.map((sub) => (
                 <button
                   key={sub.id}
+                  data-testid="sidebar-sub"
                   onClick={() => selectSubscription(sub.id)}
                   className={`w-full text-left px-4 py-3 hover:bg-white/[0.05] transition-colors ${
                     selectedSubscriptionId === sub.id ? "bg-white/[0.08]" : ""
@@ -70,6 +73,7 @@ function App() {
                 >
                   <div className="flex items-center gap-2">
                     <span
+                      data-testid={`connection-dot-${sub.is_active ? "online" : "offline"}`}
                       className={`w-2 h-2 rounded-full shrink-0 ${
                         sub.is_active
                           ? "bg-[#107c10]"
@@ -91,6 +95,7 @@ function App() {
           {/* Nav buttons */}
           <div className="border-t border-white/[0.08] p-2 flex flex-col gap-1">
             <button
+              data-testid="nav-inbox"
               onClick={() => setActiveTab("inbox")}
               className={`w-full text-left px-3 py-2 rounded text-[14px] transition-colors ${
                 activeTab === "inbox"
@@ -101,6 +106,7 @@ function App() {
               Inbox
             </button>
             <button
+              data-testid="nav-settings"
               onClick={() => setActiveTab("settings")}
               className={`w-full text-left px-3 py-2 rounded text-[14px] transition-colors ${
                 activeTab === "settings"

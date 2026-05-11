@@ -56,6 +56,7 @@ function Inbox() {
           messages.map((msg) => (
             <button
               key={msg.id ?? `msg-${msg.received_at}`}
+              data-testid="message-item"
               onClick={() => handleSelect(msg)}
               className={`w-full text-left px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.08] transition-colors ${
                 selectedMessageId === msg.id ? "bg-white/[0.06]" : ""

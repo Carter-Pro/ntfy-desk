@@ -34,6 +34,7 @@ function MessageDetail({ message, onDelete, onMarkRead }: Props) {
 
       <div className="flex gap-2 pt-4 border-t border-white/[0.08]">
         <button
+          data-testid="delete-message-btn"
           onClick={onDelete}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#c50f1f] hover:bg-[#a00d1a] text-white text-sm rounded-lg transition-colors"
         >
@@ -42,6 +43,7 @@ function MessageDetail({ message, onDelete, onMarkRead }: Props) {
         </button>
         {!message.is_read && (
           <button
+            data-testid="mark-read-btn"
             onClick={onMarkRead}
             className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white text-sm rounded-lg transition-colors"
           >
