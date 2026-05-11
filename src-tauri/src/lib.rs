@@ -1,3 +1,4 @@
+mod commands;
 mod config;
 mod database;
 mod error;
@@ -27,11 +28,6 @@ impl AppState {
             connection_handles: Mutex::new(HashMap::new()),
         }
     }
-}
-
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -79,7 +75,17 @@ pub fn run() {
             app.manage(Mutex::new(state));
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![
+            commands::add_subscription,
+            commands::remove_subscription,
+            commands::list_subscriptions,
+            commands::get_messages,
+            commands::mark_read,
+            commands::delete_message,
+            commands::get_settings,
+            commands::update_setting,
+            commands::greet,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
