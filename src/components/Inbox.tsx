@@ -46,7 +46,7 @@ function Inbox() {
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
             <InboxIcon size={32} className="text-[#999] mb-3" />
-            <p className="text-[13px] text-[#999]">
+            <p className="text-xs text-[#999]">
               {selectedSubscriptionId === null
                 ? "Select a subscription to view messages."
                 : "No messages for this subscription."}
@@ -57,14 +57,14 @@ function Inbox() {
             <button
               key={msg.id ?? `msg-${msg.received_at}`}
               onClick={() => handleSelect(msg)}
-              className={`w-full text-left px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.03] transition-colors ${
+              className={`w-full text-left px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.08] transition-colors ${
                 selectedMessageId === msg.id ? "bg-white/[0.06]" : ""
               } ${!msg.is_read ? "border-l-2 border-l-[#0078d4]" : ""}`}
             >
               <div className="flex items-start justify-between gap-2">
                 <span
                   className={`text-[14px] ${
-                    msg.is_read ? "text-[#999]" : "text-white font-medium"
+                    msg.is_read ? "text-[#999]" : "text-white font-semibold"
                   } line-clamp-1`}
                 >
                   {msg.title || "(no title)"}
@@ -74,7 +74,7 @@ function Inbox() {
                 </time>
               </div>
               {msg.body && (
-                <p className="text-[12px] text-[#999] mt-0.5 line-clamp-1">
+                <p className="text-[12px] text-[#999] mt-1 line-clamp-2">
                   {msg.body}
                 </p>
               )}
@@ -98,7 +98,7 @@ function Inbox() {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <InboxIcon size={32} className="text-[#999] mb-3" />
-            <p className="text-[13px] text-[#999]">
+            <p className="text-xs text-[#999]">
               Select a message to view details.
             </p>
           </div>

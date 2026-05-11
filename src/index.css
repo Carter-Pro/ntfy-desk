@@ -15,6 +15,14 @@
   --color-fluent-connected: #107c10;
   --color-fluent-disconnected: #c50f1f;
   --color-fluent-dnd: #ffd700;
+
+  /* Theme Backgrounds */
+  --color-bg-primary: #202020;
+  --color-bg-secondary: #2d2d2d;
+  --color-bg-tertiary: #3a3a3a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-tertiary: #999999;
 }
 
 /* Global transitions (from UI_DESIGN.md) */

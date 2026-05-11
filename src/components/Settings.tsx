@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trash2, Plus, X } from "lucide-react";
 import { useStore } from "../store";
 
@@ -13,6 +13,13 @@ function Settings() {
   const [showDialog, setShowDialog] = useState(false);
   const [url, setUrl] = useState("");
   const [topic, setTopic] = useState("");
+
+  useEffect(() => {
+    if (!showDialog) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowDialog(false); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showDialog]);
 
   const handleAdd = async () => {
     if (!url.trim() || !topic.trim()) return;
@@ -30,14 +37,14 @@ function Settings() {
           <h2 className="text-[16px] font-semibold">Subscriptions</h2>
           <button
             onClick={() => setShowDialog(true)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-[13px] rounded-lg transition-colors"
+            className="flex items-center gap-1 px-3 py-2 bg-[#0078d4] hover:bg-[#005a9e] text-white text-sm rounded-lg transition-colors"
           >
             <Plus size={14} /> Add Subscription
           </button>
         </div>
         <div className="space-y-2">
           {subscriptions.length === 0 ? (
-            <p className="text-[13px] text-[#999] py-4">
+            <p className="text-xs text-[#999] py-4">
               No subscriptions configured.
             </p>
           ) : (
@@ -55,7 +62,7 @@ function Settings() {
                       {sub.topic}
                     </span>
                   </div>
-                  <p className="text-[12px] text-[#999] truncate mt-0.5 pl-4">
+                  <p className="text-[12px] text-[#999] truncate mt-1 pl-4">
                     {sub.url}
                   </p>
                 </div>
@@ -90,26 +97,26 @@ function Settings() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="ntfy server URL (e.g. https://ntfy.sh/mytopic)"
-                className="w-full px-3 py-2 bg-[#202020] border border-white/[0.08] rounded-lg text-white text-[13px] placeholder-[#999] focus:border-[#0078d4] outline-none mb-3"
+                className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded-lg text-white text-sm placeholder-[#999] focus:border-[#0078d4] outline-none mb-3"
               />
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="Topic name"
-                className="w-full px-3 py-2 bg-[#202020] border border-white/[0.08] rounded-lg text-white text-[13px] placeholder-[#999] focus:border-[#0078d4] outline-none mb-6"
+                className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded-lg text-white text-sm placeholder-[#999] focus:border-[#0078d4] outline-none mb-6"
               />
               <div className="flex gap-2">
                 <button
                   onClick={handleAdd}
                   disabled={!url.trim() || !topic.trim()}
-                  className="flex-1 px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-[13px] font-medium transition-colors"
+                  className="flex-1 px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Add
                 </button>
                 <button
                   onClick={() => setShowDialog(false)}
-                  className="flex-1 px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white rounded-lg text-[13px] font-medium transition-colors"
+                  className="flex-1 px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -144,7 +151,7 @@ function Settings() {
                   type="time"
                   value={settings.dnd_start}
                   onChange={(e) => updateSetting("dnd_start", e.target.value)}
-                  className="w-full px-3 py-1.5 bg-[#202020] border border-white/[0.08] rounded text-white text-[13px] focus:border-[#0078d4] outline-none"
+                  className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded text-white text-sm focus:border-[#0078d4] outline-none"
                 />
               </div>
               <div>
@@ -155,7 +162,7 @@ function Settings() {
                   type="time"
                   value={settings.dnd_end}
                   onChange={(e) => updateSetting("dnd_end", e.target.value)}
-                  className="w-full px-3 py-1.5 bg-[#202020] border border-white/[0.08] rounded text-white text-[13px] focus:border-[#0078d4] outline-none"
+                  className="w-full px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded text-white text-sm focus:border-[#0078d4] outline-none"
                 />
               </div>
             </div>
@@ -197,7 +204,7 @@ function Settings() {
               onChange={(e) =>
                 updateSetting("message_retention_days", e.target.value)
               }
-              className="w-24 px-3 py-1.5 bg-[#202020] border border-white/[0.08] rounded text-white text-[13px] focus:border-[#0078d4] outline-none"
+              className="w-24 px-3 py-2 bg-[#2d2d2d] border border-white/[0.08] rounded text-white text-sm focus:border-[#0078d4] outline-none"
             />
           </div>
           <label className="flex items-center justify-between px-4 py-3 bg-[#2d2d2d] border border-white/[0.08] rounded-lg cursor-pointer">

@@ -17,7 +17,6 @@ describe("useStore", () => {
     });
     expect(state.selectedSubscriptionId).toBeNull();
     expect(state.activeTab).toBe("inbox");
-    expect(state.loading).toBe(false);
     expect(state.error).toBeNull();
   });
 

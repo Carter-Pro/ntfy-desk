@@ -9,7 +9,6 @@ interface StoreState {
   settings: AppSettings;
   selectedSubscriptionId: number | null;
   activeTab: "inbox" | "settings";
-  loading: boolean;
   error: string | null;
 
   // IPC actions
@@ -33,31 +32,30 @@ export const useStore = create<StoreState>((set, get) => ({
   settings: { ...DEFAULT_SETTINGS },
   selectedSubscriptionId: null,
   activeTab: "inbox",
-  loading: false,
   error: null,
 
   loadSubscriptions: async () => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const subscriptions = await invoke<Subscription[]>("list_subscriptions");
-      set({ subscriptions, loading: false });
+      set({ subscriptions });
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 
   addSubscription: async (url, topic) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       await invoke<Subscription>("add_subscription", { url, topic });
       await get().loadSubscriptions();
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 
   removeSubscription: async (id) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       await invoke<void>("remove_subscription", { id });
       const state = get();
@@ -67,18 +65,17 @@ export const useStore = create<StoreState>((set, get) => ({
           subscriptions,
           selectedSubscriptionId: null,
           messages: [],
-          loading: false,
         });
       } else {
-        set({ subscriptions, loading: false });
+        set({ subscriptions });
       }
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 
   loadMessages: async () => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const { selectedSubscriptionId } = get();
       const args: Record<string, unknown> = {};
@@ -86,9 +83,9 @@ export const useStore = create<StoreState>((set, get) => ({
         args.subscriptionId = selectedSubscriptionId;
       }
       const messages = await invoke<Message[]>("get_messages", args);
-      set({ messages, loading: false });
+      set({ messages });
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 
@@ -121,22 +118,22 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   loadSettings: async () => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const settings = await invoke<AppSettings>("get_settings");
-      set({ settings, loading: false });
+      set({ settings });
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 
   updateSetting: async (key, value) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       await invoke<void>("update_setting", { key, value });
       await get().loadSettings();
     } catch (err) {
-      set({ error: String(err), loading: false });
+      set({ error: String(err) });
     }
   },
 

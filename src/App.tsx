@@ -33,7 +33,7 @@ function App() {
       <div className="h-screen flex flex-col bg-[#202020] text-white">
       {/* App Header */}
       <header className="h-[52px] flex items-center px-4 bg-[#202020]/80 backdrop-blur border-b border-white/[0.08] shrink-0">
-        <h1 className="text-[16px] font-semibold">ntfy desk</h1>
+        <h1 className="text-lg font-semibold">ntfy desk</h1>
         <span className="ml-auto text-[12px] text-[#999999]">v0.1.0</span>
       </header>
 
@@ -43,7 +43,7 @@ function App() {
         <aside className="w-[280px] flex flex-col border-r border-white/[0.08] shrink-0">
           {/* Subscriptions header */}
           <div className="px-4 py-3 border-b border-white/[0.08]">
-            <h2 className="text-[13px] font-semibold text-[#e0e0e0] uppercase tracking-wide">
+            <h2 className="text-xs font-semibold text-[#e0e0e0] uppercase tracking-wide">
               Subscriptions
               {subscriptions.length > 0 && (
                 <span className="text-[#999999] font-normal normal-case ml-1">
@@ -56,7 +56,7 @@ function App() {
           {/* Subscription list */}
           <div className="flex-1 overflow-y-auto">
             {subscriptions.length === 0 ? (
-              <p className="px-4 py-3 text-[13px] text-[#999999]">
+              <p className="px-4 py-3 text-xs text-[#999999]">
                 No subscriptions yet. Add one in Settings.
               </p>
             ) : (
@@ -117,7 +117,7 @@ function App() {
         <main className="flex-1 overflow-hidden">
           {/* Error banner */}
           {error && (
-            <div className="mx-4 mt-4 px-4 py-3 bg-[#c50f1f]/20 border border-[#c50f1f]/40 rounded text-[13px] text-[#e0e0e0]">
+            <div className="mx-4 mt-4 px-4 py-3 bg-[#c50f1f]/20 border border-[#c50f1f]/40 rounded text-sm text-[#e0e0e0]">
               {error}
             </div>
           )}
