@@ -5,11 +5,11 @@ import Inbox from "./components/Inbox";
 import Settings from "./components/Settings";
 import {
   BellIcon,
-  InboxIcon,
   SettingsIcon,
   AlertCircleIcon,
   PlusIcon,
   XIcon,
+  ArrowLeftIcon,
 } from "lucide-react";
 
 function App() {
@@ -42,6 +42,14 @@ function App() {
     s.messages.filter((m) => !m.is_read).length
   );
 
+  /* Clicking a subscription auto-switches back to Inbox */
+  const handleSubClick = (id: number) => {
+    selectSubscription(id);
+    if (activeTab !== "inbox") {
+      setActiveTab("inbox");
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="h-screen flex flex-col bg-[#202020] text-white overflow-hidden">
@@ -64,7 +72,7 @@ function App() {
         {/* ── Body ── */}
         <div className="flex flex-1 min-h-0">
 
-          {/* ── Sidebar ── */}
+          {/* ── Sidebar — subscriptions only ── */}
           <aside className="w-[260px] flex flex-col border-r border-white/[0.07] shrink-0 bg-[#1a1a1a]">
 
             {/* Subscriptions header */}
@@ -102,7 +110,7 @@ function App() {
                     <button
                       key={sub.id}
                       data-testid="sidebar-sub"
-                      onClick={() => selectSubscription(sub.id!)}
+                      onClick={() => handleSubClick(sub.id!)}
                       className={[
                         "w-full text-left px-3 py-2.5 rounded-lg mb-0.5 group relative transition-all duration-150",
                         isSelected
@@ -140,30 +148,16 @@ function App() {
               )}
             </div>
 
-            {/* Bottom nav */}
-            <div className="border-t border-white/[0.07] p-2 space-y-0.5">
-              <button
-                data-testid="nav-inbox"
-                onClick={() => setActiveTab("inbox")}
-                className={[
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 relative",
-                  activeTab === "inbox" ? "nav-active" : "text-[#999] hover:bg-white/[0.05] hover:text-white",
-                ].join(" ")}
-              >
-                <InboxIcon size={15} strokeWidth={2} />
-                <span>Inbox</span>
-                {unreadCount > 0 && activeTab !== "inbox" && (
-                  <span className="ml-auto px-1.5 py-0.5 text-[10px] font-semibold bg-[#0078d4] rounded-full min-w-[18px] text-center leading-none">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+            {/* Sidebar footer — Settings gear only */}
+            <div className="border-t border-white/[0.07] p-2">
               <button
                 data-testid="nav-settings"
                 onClick={() => setActiveTab("settings")}
                 className={[
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 relative",
-                  activeTab === "settings" ? "nav-active" : "text-[#999] hover:bg-white/[0.05] hover:text-white",
+                  activeTab === "settings"
+                    ? "nav-active"
+                    : "text-[#666] hover:bg-white/[0.05] hover:text-[#999]",
                 ].join(" ")}
               >
                 <SettingsIcon size={15} strokeWidth={2} />
@@ -188,15 +182,35 @@ function App() {
               </div>
             )}
 
-            {/* Inbox tab */}
-            {activeTab === "inbox" && <Inbox />}
-
-            {/* Settings tab */}
+            {/* ── Settings view ── */}
             {activeTab === "settings" && (
-              <div className="overflow-y-auto h-full">
-                <Settings />
+              <div className="flex flex-col h-full fade-in">
+                {/* Breadcrumb header with back-to-inbox */}
+                <div className="px-5 py-3 border-b border-white/[0.07] flex items-center gap-3 shrink-0 bg-white/[0.02]">
+                  <button
+                    data-testid="nav-inbox"
+                    onClick={() => setActiveTab("inbox")}
+                    className="flex items-center gap-1.5 text-[13px] text-[#0078d4] hover:text-[#40b6ff] transition-colors font-medium group"
+                  >
+                    <ArrowLeftIcon size={14} strokeWidth={2.5} className="group-hover:-translate-x-0.5 transition-transform" />
+                    Inbox
+                  </button>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#0078d4] text-white rounded-full min-w-[18px] text-center leading-none">
+                      {unreadCount}
+                    </span>
+                  )}
+                  <span className="text-[#333]">/</span>
+                  <span className="text-[13px] font-semibold text-[#888]">Settings</span>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  <Settings />
+                </div>
               </div>
             )}
+
+            {/* ── Inbox view (default) ── */}
+            {activeTab === "inbox" && <Inbox />}
           </main>
         </div>
       </div>
